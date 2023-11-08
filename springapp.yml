@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: spring-deployment
+  name: spring-dep
 spec:
   replicas: 3
   selector:
@@ -13,21 +13,23 @@ spec:
         app: spring-app
     spec:
       containers:
-        - name: spring-container 
+        - name: spring-app
           image: 69966/springgradleimg:1.1.1
           ports:
             - containerPort: 8080
           volumeMounts:
-            - name: my-vol
+            - name: spring-vol
               mountPath: /app/src/main/resources/images
       volumes:
-        - name: my-vol 
+        - name: spring-vol
           nfs:
-            server: 10.184.0.4
+            server: 10.148.0.19
             path: /opt/nfs/data
+
 ---
+# Path: spring-svc.yaml
 apiVersion: v1
-kind: Service 
+kind: Service
 metadata:
   name: spring-svc
 spec:
@@ -35,30 +37,32 @@ spec:
   selector:
     app: spring-app
   ports:
-    - port: 8080
+    - protocol: TCP
+      port: 8080
       targetPort: 8080
+
 ---
-# create ingress for the spring application 
+# Path: spring-ingress.yaml
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: spring-ingress
-  annotations: 
-    cert-manager.io/cluster-issuer: letsencrypt
-    kubernetes.io/ingresClassName: nginx
+  annotations:
+    kubernetes.io/ingressClassName: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt"
 spec:
   tls:
-    - hosts:
-        - ag.kuberthy.me
-      secretName: myspring-tls 
+  - hosts:
+    - b.sen-pai.live
+    secretName: spring-tls
   rules:
-    - host: ag.kuberthy.me
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: spring-svc
-                port:
-                  number: 8080
+  - host: b.sen-pai.live
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: spring-svc
+            port:
+              number: 8080
