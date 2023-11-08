@@ -23,7 +23,7 @@ spec:
       volumes:
         - name: spring-vol
           nfs:
-            server: 10.148.0.19
+            server: 10.184.0.4
             path: /opt/nfs/data
 
 ---
@@ -53,10 +53,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - b.sen-pai.live
+    - ag.kuberthy.me
     secretName: spring-tls
   rules:
-  - host: b.sen-pai.live
+  - host: ag.kuberthy.me
     http:
       paths:
       - path: /
